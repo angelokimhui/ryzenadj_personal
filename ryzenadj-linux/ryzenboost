@@ -1,0 +1,6 @@
+#!/bin/sh
+while :
+do
+	ryzenadj -a 25000 -b 25000 -c 25000 -f 75 --set-coall 25 --max-performance > /dev/null
+	sleep 5
+done
