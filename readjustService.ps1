@@ -46,7 +46,7 @@ function doAdjust_ACmode {
     adjust "vrmsocmax_current" 20000
     adjust "vrm_current" 35000
     adjust "vrmsoc_current" 15000
-    # adjust "coall" 1048555
+    adjust "coall" 1048555
 }
 ################################################################################
 #### Configuration End
