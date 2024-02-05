@@ -1,6 +1,6 @@
 #!/bin/sh
 while :
 do
-	ryzenadj --stapm-limit 55000 --fast-limit 55000 --slow-limit 55000 --apu-slow-limit 55000 --tctl-temp 90 --apu-skin-temp 60 --vrmsoc-current 20000 --vrm-current 40000 --vrmsocmax-current 30000 --vrmmax-current 100000 --set-coall 1048555 --max-performance >> /dev/null &
+	ryzenadj --stapm-limit 55000 --fast-limit 55000 --slow-limit 55000 --apu-slow-limit 55000 --tctl-temp 90 --apu-skin-temp 60 --vrmsoc-current 20000 --vrm-current 40000 --vrmsocmax-current 30000 --vrmmax-current 80000 --set-coall 1048555 --max-performance >> /dev/null &
 	sleep 20
 done
