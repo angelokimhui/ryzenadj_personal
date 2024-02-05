@@ -36,16 +36,16 @@ function doAdjust_ACmode {
     $Script:repeatWaitTimeSeconds = 10    #only use values below 5s if you are using $monitorField
     enable "max_performance"
     # enable "power_saving"
-    adjust "stapm_limit" 50000
-    adjust "fast_limit" 50000
-    adjust "slow_limit" 50000
+    adjust "stapm_limit" 55000
+    adjust "fast_limit" 55000
+    adjust "slow_limit" 55000
     adjust "prochot_deassertion_ramp" 1
     adjust "tctl_temp" 90
     adjust "apu_skin_temp_limit" 60
-    adjust "vrmmax_current" 80000
-    adjust "vrmsocmax_current" 20000
-    adjust "vrm_current" 35000
-    adjust "vrmsoc_current" 15000
+    adjust "vrmmax_current" 100000
+    adjust "vrmsocmax_current" 30000
+    adjust "vrm_current" 40000
+    adjust "vrmsoc_current" 20000
     adjust "coall" 1048555
 }
 ################################################################################
