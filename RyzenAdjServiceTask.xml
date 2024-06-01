@@ -37,7 +37,7 @@
   <Actions Context="Author">
     <Exec>
       <Command>powershell</Command>
-      <Arguments>-WindowStyle hidden -ExecutionPolicy Bypass -file "C:\Perf\RyzenADJ\readjustService.ps1"</Arguments>
+      <Arguments>-WindowStyle hidden -ExecutionPolicy Bypass -file "C:\Perf\readjustService.ps1"</Arguments>
     </Exec>
   </Actions>
 </Task>
