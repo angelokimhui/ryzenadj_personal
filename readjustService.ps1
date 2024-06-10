@@ -44,7 +44,7 @@ function doAdjust_ACmode {
     adjust "stapm_limit" 35000
     adjust "fast_limit" 35000
     adjust "slow_limit" 20000
-    adjust "slow_time" 20
+    adjust "slow_time" 15
     adjust "prochot_deassertion_ramp" 1
     adjust "tctl_temp" 90
     adjust "apu_skin_temp_limit" 60
