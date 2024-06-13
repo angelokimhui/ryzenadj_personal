@@ -6,5 +6,8 @@ do
 
 	# HP 15s EQ3xxx with very bad VRM cooling and bad heat transfer even with liquid metal as TIM.
 	ryzenadj --stapm-limit 35000 --fast-limit 35000 --slow-limit 25000 --apu-slow-limit 25000 --slow-time 15 --tctl-temp 85 --apu-skin-temp 60 --max-performance >> /dev/null &
-	sleep 20
+
+	# Disable Loop as I think the settings aren't being overriden in runtime
+	# sleep 20
+	break
 done
