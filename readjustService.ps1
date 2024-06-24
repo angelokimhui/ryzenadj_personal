@@ -24,8 +24,8 @@ $debugMode = $false
 
 ## CONTROL FAN SPEED FORMAT 44 (register) and 100 (as fanspeed) ##
 # Start-Process -NoNewWindow -Wait -filePath "C:\Data\Programs\RyzenADJ\ecprobe\ec-probe.exe" -ArgumentList("write", "44", "100")
-Start-Process -NoNewWindow -Wait -filepath "C:\Program Files (x86)\NoteBook FanControl\nbfc.exe" -ArgumentList "config --set HP-Laptop-15s-eq3xxx-QUIET"
-Start-Process -NoNewWindow -Wait -filepath "C:\Program Files (x86)\NoteBook FanControl\nbfc.exe" -ArgumentList "start"
+# Start-Process -NoNewWindow -Wait -filepath "C:\Program Files (x86)\NoteBook FanControl\nbfc.exe" -ArgumentList "config --set HP-Laptop-15s-eq3xxx"
+# Start-Process -NoNewWindow -Wait -filepath "C:\Program Files (x86)\NoteBook FanControl\nbfc.exe" -ArgumentList "start"
 
 # Undervolt -30 on all cores
 # Start-Process -NoNewWindow -Wait -filePath "C:\Data\Programs\RyzenADJ\ryzenadj.exe" -ArgumentList("--set-coper=0x0FFFCE")
