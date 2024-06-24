@@ -1,15 +1,21 @@
-﻿Clear-Host
-Write-Host "Starting Fan Control"
+﻿<#
+.SYNOPSIS
+    Automates ecprobe calls based on custom conditions
+.NOTES
+    SPDX-License-Identifier: LGPL
+    Angelo Kim Hui Lim <angelokimhui@gmail.com>
+#>
+
+# Fix CPU Util bug after bootup
+Start-Sleep -Seconds 1
 
 Add-Type -Path $PSScriptRoot"\Plugins\OpenHardwareMonitorLib.dll"
 $hwmon = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
 $hwmon.CPUEnabled= 1;
-
 $hwmon.Open();
 
 foreach ($hardwareItem in $hwmon.Hardware)
 {
-
  if($hardwareItem.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
     while ($true) 
     {
@@ -27,7 +33,6 @@ foreach ($hardwareItem in $hwmon.Hardware)
               # $sensor.Value
               Start-Sleep -Milliseconds 500
              }
-             Clear-Host
             }
             elseif ($sensor.Value -lt 40)
             {
@@ -38,7 +43,6 @@ foreach ($hardwareItem in $hwmon.Hardware)
               # $sensor.Value
               Start-Sleep -Milliseconds 500
              }
-             Clear-Host
             }
             elseif ($sensor.Value -lt 50)
             {
@@ -49,7 +53,6 @@ foreach ($hardwareItem in $hwmon.Hardware)
               # $sensor.Value
               Start-Sleep -Milliseconds 500
              }
-             Clear-Host
             }
             elseif ($sensor.Value -lt 75)
             {
@@ -60,7 +63,6 @@ foreach ($hardwareItem in $hwmon.Hardware)
               # $sensor.Value
               Start-Sleep -Milliseconds 500
              }
-             Clear-Host
             }
             elseif ($sensor.Value -lt 80)
             {
@@ -71,7 +73,6 @@ foreach ($hardwareItem in $hwmon.Hardware)
               # $sensor.Value
               Start-Sleep -Milliseconds 500
              }
-             Clear-Host
             }
             elseif ($sensor.Value -gt 80)
             {
@@ -82,7 +83,6 @@ foreach ($hardwareItem in $hwmon.Hardware)
               # $sensor.Value
               Start-Sleep -Milliseconds 500
              }
-             Clear-Host
             }
          }
         }
