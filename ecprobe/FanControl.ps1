@@ -26,7 +26,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                         while ($sensor.Value -lt 35) {
                         $hardwareItem.Update()
                         # $sensor.Value
-                        Start-Sleep -Milliseconds 500
+                        Start-Sleep -Milliseconds 3000
                         }
                     }
                     elseif ($sensor.Value -lt 40){
@@ -35,7 +35,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                         while ($sensor.Value -gt 30 -and $sensor.Value -lt 45) {
                         $hardwareItem.Update()
                         # $sensor.Value
-                        Start-Sleep -Milliseconds 500
+                        Start-Sleep -Milliseconds 2000
                         }
                     }
                     elseif ($sensor.Value -lt 50){
@@ -44,7 +44,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                         while ($sensor.Value -gt 40 -and $sensor.Value -lt 65) {
                         $hardwareItem.Update()
                         # $sensor.Value
-                        Start-Sleep -Milliseconds 500
+                        Start-Sleep -Milliseconds 1000
                         }
                     }
                     elseif ($sensor.Value -lt 75){
