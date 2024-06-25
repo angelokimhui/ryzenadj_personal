@@ -22,88 +22,88 @@ foreach ($hardwareItem in $hwmon.Hardware){
         foreach ($sensor in $hardwareItem.Sensors){
             if ($sensor.SensorType -eq "Temperature"){
                 while ($true){
-                    if ($sensor.Value -lt 35){
-                        if ($currentFS -eq 0) {
-                            while ($sensor.Value -lt 35) {
-                                Start-Sleep -Milliseconds 3000
-                                $hardwareItem.Update()
-                                # $sensor.Value
-                            }
-                        }
-                        else {
+                    if ($sensor.Value -le 35){
+                        if ($currentFS -ne 0) {
                             $currentFS = 0;
                             # Write-Host "Writing to EC - Fanspeed 0"
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "0")
                         }
-                    }
-                    elseif ($sensor.Value -lt 40){
-                        if ($currentFS -eq 30) {
+                        else {
                             while ($sensor.Value -lt 40) {
-                                Start-Sleep -Milliseconds 2000
                                 $hardwareItem.Update()
                                 # $sensor.Value
+                                Start-Sleep -Milliseconds 3000
                             }
                         }
-                        else {
+                    }
+                    elseif ($sensor.Value -le 40){
+                        if ($currentFS -ne 30) {
                             $currentFS = 30;
                             # Write-Host "Writing to EC - Fanspeed 30"
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "30")
                         }
-                    }
-                    elseif ($sensor.Value -lt 50){
-                        if ($currentFS -eq 50) {
-                            while ($sensor.Value -lt 50) {
-                                Start-Sleep -Milliseconds 1000
+                        else {
+                            while ($sensor.Value -lt 50 -and $sensor.Value -gt 30) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
+                                Start-Sleep -Milliseconds 2000
                             }
                         }
-                        else {
+                    }
+                    elseif ($sensor.Value -le 50){
+                        if ($currentFS -ne 50) {
                             $currentFS = 50;
                             # Write-Host "Writing to EC - Fanspeed 50"
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "50")
                         }
-                    }
-                    elseif ($sensor.Value -lt 75){
-                        if ($currentFS -eq 60) {
-                            while ($sensor.Value -lt 75) {
-                                Start-Sleep -Milliseconds 500
+                        else {
+                            while ($sensor.Value -lt 75 -and $sensor.Value -gt 40) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
+                                Start-Sleep -Milliseconds 1000
                             }
                         }
-                        else {
+                    }
+                    elseif ($sensor.Value -le 75){
+                        if ($currentFS -ne 60) {
                             $currentFS = 60;
                             # Write-Host "Writing to EC - Fanspeed 60"
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "60")
                         }
-                    }
-                    elseif ($sensor.Value -lt 80){
-                        if ($currentFS -eq 80) {
-                            while ($sensor.Value -lt 80) {
-                                Start-Sleep -Milliseconds 500
+                        else {
+                            while ($sensor.Value -lt 80 -and $sensor.Value -gt 50) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
+                                Start-Sleep -Milliseconds 500
                             }
                         }
-                        else {
+                    }
+                    elseif ($sensor.Value -le 80){
+                        if ($currentFS -ne 80) {
                             $currentFS = 80;
                             # Write-Host "Writing to EC - Fanspeed 80"
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "80")
                         }
-                    }
-                    elseif ($sensor.Value -ge 80){
-                        if ($currentFS -eq 100) {
-                            while ($sensor.Value -gt 70) {
-                                Start-Sleep -Milliseconds 500
+                        else {
+                            while ($sensor.Value -lt 85 -and $sensor.Value -gt 75) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
+                                Start-Sleep -Milliseconds 500
                             }
                         }
-                        else {
+                    }
+                    elseif ($sensor.Value -ge 80){
+                        if ($currentFS -ne 100) {
                             $currentFS = 100;
                             # Write-Host "Writing to EC - Fanspeed 100"
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "100")
+                        }
+                        else {
+                            while ($sensor.Value -gt 75) {
+                                $hardwareItem.Update()
+                                # $sensor.Value
+                                Start-Sleep -Milliseconds 500
+                            }
                         }
                     }
                 }
