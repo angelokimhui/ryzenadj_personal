@@ -43,7 +43,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "30")
                         }
                         else {
-                            while ($sensor.Value -lt 55 -and $sensor.Value -gt 30) {
+                            while ($sensor.Value -lt 65 -and $sensor.Value -gt 30) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
                                 Start-Sleep -Milliseconds 2000
@@ -71,7 +71,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "60")
                         }
                         else {
-                            while ($sensor.Value -lt 80 -and $sensor.Value -gt 50) {
+                            while ($sensor.Value -lt 80 -and $sensor.Value -gt 55) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
                                 Start-Sleep -Milliseconds 500
