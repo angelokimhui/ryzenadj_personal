@@ -33,7 +33,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -lt 40) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Milliseconds 3000
+                                Start-Sleep -Seconds 3
                             }
                         }
                     }
@@ -47,7 +47,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -lt 65 -and $sensor.Value -gt 30) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Milliseconds 2000
+                                Start-Sleep -Seconds 2
                             }
                         }
                     }
@@ -61,7 +61,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -lt 75 -and $sensor.Value -gt 50) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Milliseconds 1000
+                                Start-Sleep -Seconds 1
                             }
                         }
                     }
@@ -75,7 +75,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -lt 80 -and $sensor.Value -gt 60) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Milliseconds 500
+                                Start-Sleep -Seconds 1
                             }
                         }
                     }
@@ -89,7 +89,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -lt 85 -and $sensor.Value -gt 75) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Milliseconds 500
+                                Start-Sleep -Seconds 10
                             }
                         }
                     }
@@ -103,7 +103,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -gt 75) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Milliseconds 500
+                                Start-Sleep -Seconds 5
                             }
                         }
                     }
