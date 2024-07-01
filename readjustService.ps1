@@ -46,8 +46,8 @@ function doAdjust_ACmode {
     adjust "slow_limit" 25000
     adjust "slow_time" 20
     # adjust "prochot_deassertion_ramp" 1
-    adjust "tctl_temp" 85
-    adjust "apu_skin_temp_limit" 60
+    adjust "tctl_temp" 90
+    adjust "apu_skin_temp_limit" 50
     # adjust "vrmmax_current" 80000
     # adjust "vrmsocmax_current" 30000
     # adjust "vrm_current" 40000
