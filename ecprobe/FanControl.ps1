@@ -100,7 +100,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "100")
                         }
                         else {
-                            while ($sensor.Value -gt 75) {
+                            while ($sensor.Value -gt 70) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
                                 Start-Sleep -Seconds 5

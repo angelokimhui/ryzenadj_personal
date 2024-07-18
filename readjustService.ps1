@@ -38,16 +38,16 @@ $debugMode = $false
 # SET PROFILE TO 25 OR MORE WATTS in SMOKELESS UMAF OR BIOS
 
 function doAdjust_ACmode {
-    $Script:repeatWaitTimeSeconds = 20    #only use values below 5s if you are using $monitorField
-    enable "max_performance"
-    # enable "power_saving"
-    adjust "stapm_limit" 35000
-    adjust "fast_limit" 35000
+    $Script:repeatWaitTimeSeconds = 5    #only use values below 5s if you are using $monitorField
+    # enable "max_performance"
+    enable "power_saving"
+    adjust "stapm_limit" 23000
+    adjust "fast_limit" 30000
     adjust "slow_limit" 25000
     adjust "slow_time" 20
     # adjust "prochot_deassertion_ramp" 1
-    adjust "tctl_temp" 85
-    adjust "apu_skin_temp_limit" 60
+    adjust "tctl_temp" 80
+    adjust "apu_skin_temp_limit" 50
     # adjust "vrmmax_current" 80000
     # adjust "vrmsocmax_current" 30000
     # adjust "vrm_current" 40000
