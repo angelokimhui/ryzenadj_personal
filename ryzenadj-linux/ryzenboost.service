@@ -3,7 +3,7 @@ Description=Ryzenboost
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/ryzenboost
+ExecStart=/bin/bash /usr/local/bin/ryzenboost
 
 [Install]
 WantedBy=multi-user.target
