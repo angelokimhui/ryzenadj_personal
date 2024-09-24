@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Automates ecprobe calls based on custom conditions
 .NOTES
@@ -15,7 +15,7 @@ $hwmon.CPUEnabled= 1;
 $hwmon.Open();
 
 [Int]$currentFS = -1;
-Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "0")
+Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "100")
 
 foreach ($hardwareItem in $hwmon.Hardware){
     if($hardwareItem.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
@@ -58,14 +58,14 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "50")
                         }
                         else {
-                            while ($sensor.Value -lt 75 -and $sensor.Value -gt 50) {
+                            while ($sensor.Value -lt 70 -and $sensor.Value -gt 50) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
                                 Start-Sleep -Seconds 1
                             }
                         }
                     }
-                    elseif ($sensor.Value -le 75){
+                    elseif ($sensor.Value -le 70){
                         if ($currentFS -ne 60) {
                             $currentFS = 60;
                             # Write-Host "Writing to EC - Fanspeed 60"
@@ -79,21 +79,21 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             }
                         }
                     }
-                    elseif ($sensor.Value -le 80){
-                        if ($currentFS -ne 80) {
-                            $currentFS = 80;
+                    elseif ($sensor.Value -le 75){
+                        if ($currentFS -ne 95) {
+                            $currentFS = 95;
                             # Write-Host "Writing to EC - Fanspeed 80"
-                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "80")
+                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "95")
                         }
                         else {
-                            while ($sensor.Value -lt 85 -and $sensor.Value -gt 75) {
+                            while ($sensor.Value -lt 85 -and $sensor.Value -gt 70) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
                                 Start-Sleep -Seconds 10
                             }
                         }
                     }
-                    elseif ($sensor.Value -ge 80){
+                    elseif ($sensor.Value -ge 75){
                         if ($currentFS -ne 100) {
                             $currentFS = 100;
                             # Write-Host "Writing to EC - Fanspeed 100"
