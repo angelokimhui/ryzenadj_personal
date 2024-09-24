@@ -21,6 +21,8 @@ $pathToRyzenAdjDlls = Split-Path -Parent $PSCommandPath #script path is DLL path
 $showErrorPopupsDuringInit = $true
 # debug mode prints adjust success messages too instead of errorss only
 $debugMode = $false
+# some Zen3 devices have a locked STAPM limit, this workarround resets the stapm timer to have unlimited stapm. Use max stapm_limit and stapm_time (usually 500) to triger as less resets as possible
+$resetSTAPMUsage = $true
 
 ## CONTROL FAN SPEED FORMAT 44 (register) and 100 (as fanspeed) ##
 # Start-Process -NoNewWindow -Wait -filePath "C:\Data\Programs\RyzenADJ\ecprobe\ec-probe.exe" -ArgumentList("write", "44", "100")
@@ -39,15 +41,16 @@ $debugMode = $false
 
 function doAdjust_ACmode {
     $Script:repeatWaitTimeSeconds = 5    #only use values below 5s if you are using $monitorField
-    # enable "max_performance"
-    enable "power_saving"
-    adjust "stapm_limit" 23000
-    adjust "fast_limit" 30000
-    adjust "slow_limit" 25000
-    adjust "slow_time" 20
+    enable "max_performance"
+    # enable "power_saving"
+    adjust "stapm_limit" 28000
+    adjust "fast_limit" 28000
+    adjust "slow_limit" 28000
+    adjust "slow_time" 1
     # adjust "prochot_deassertion_ramp" 1
-    adjust "tctl_temp" 80
+    adjust "tctl_temp" 85
     adjust "apu_skin_temp_limit" 50
+    adjust "stapm_time" 500
     # adjust "vrmmax_current" 80000
     # adjust "vrmsocmax_current" 30000
     # adjust "vrm_current" 40000
@@ -240,6 +243,22 @@ function testConfiguration {
     }
 }
 
+function resetSTAPMIfNeeded {
+    $stapm_limit = [ryzen.adj]::get_stapm_limit($ry)
+    $stapm_value = [ryzen.adj]::get_stapm_value($ry)
+    $stapm_hysteresis = 1 #Throttling starts arround ~0.9W before limit
+
+    if ($stapm_value -gt ($stapm_limit - $stapm_hysteresis)) {
+        $stapm_time = [ryzen.adj]::get_stapm_time($ry)
+        $reduced_stapm_limit = ($stapm_limit - 5) #reduce stapm by 5W
+        # Write-Host "[STAPM_RESET] stapm_value ($stapm_value) nearing stapm_limit ($stapm_limit), resetting..."
+        [void][ryzen.adj]::set_stapm_limit($ry, ($reduced_stapm_limit) * 1000)
+        [void][ryzen.adj]::set_stapm_time($ry, 0)
+        [Threading.Thread]::Sleep(10) #10ms is usually enough time
+        [void][ryzen.adj]::set_stapm_time($ry, $stapm_time)
+        [void][ryzen.adj]::set_stapm_limit($ry, $stapm_limit * 1250) # add 25% STAPM limit in case we are at battery saving mode where applied values get reduced by 10% or 20%
+    }
+}
 
 if(-not $Script:repeatWaitTimeSeconds) { $Script:repeatWaitTimeSeconds = 5 }
 $Script:monitorFieldAdjResult = 0; #adjust result will be used for monitoring because SMU may only set 90% and 80% of your value
@@ -260,6 +279,9 @@ while($true) {
         $oldWait = $Script:repeatWaitTimeSeconds
         doAdjust_ACmode
         updateMonitorFieldAdjResult
+        if($resetSTAPMUsage){
+            resetSTAPMIfNeeded
+        }
         if($oldWait -ne $Script:repeatWaitTimeSeconds ) { Write-Host "$processType every $Script:repeatWaitTimeSeconds seconds..." }
 
     sleep $Script:repeatWaitTimeSeconds
