@@ -24,11 +24,6 @@ $debugMode = $false
 # some Zen3 devices have a locked STAPM limit, this workarround resets the stapm timer to have unlimited stapm. Use max stapm_limit and stapm_time (usually 500) to triger as less resets as possible
 $resetSTAPMUsage = $true
 
-## CONTROL FAN SPEED FORMAT 44 (register) and 100 (as fanspeed) ##
-# Start-Process -NoNewWindow -Wait -filePath "C:\Data\Programs\RyzenADJ\ecprobe\ec-probe.exe" -ArgumentList("write", "44", "100")
-# Start-Process -NoNewWindow -Wait -filepath "C:\Program Files (x86)\NoteBook FanControl\nbfc.exe" -ArgumentList "config --set HP-Laptop-15s-eq3xxx"
-# Start-Process -NoNewWindow -Wait -filepath "C:\Program Files (x86)\NoteBook FanControl\nbfc.exe" -ArgumentList "start"
-
 # Undervolt -30 on all cores
 # Start-Process -NoNewWindow -Wait -filePath "C:\Data\Programs\RyzenADJ\ryzenadj.exe" -ArgumentList("--set-coper=0x0FFFCE")
 # Start-Process -NoNewWindow -Wait -filePath "C:\Data\Programs\RyzenADJ\ryzenadj.exe" -ArgumentList("--set-coper=0x1FFFCE")
@@ -39,16 +34,16 @@ $resetSTAPMUsage = $true
 
 # SET PROFILE TO 25 OR MORE WATTS in SMOKELESS UMAF OR BIOS
 
-function doAdjust_ACmode {
-    $Script:repeatWaitTimeSeconds = 5    #only use values below 5s if you are using $monitorField
+function doAdjust_ryzenadj {
+    $Script:repeatWaitTimeSeconds = 10    #only use values below 5s if you are using $monitorField
     enable "max_performance"
     # enable "power_saving"
-    adjust "stapm_limit" 28000
-    adjust "fast_limit" 28000
-    adjust "slow_limit" 28000
-    adjust "slow_time" 1
-    # adjust "prochot_deassertion_ramp" 1
-    adjust "tctl_temp" 85
+    adjust "stapm_limit" 65000
+    adjust "fast_limit" 25000
+    adjust "slow_limit" 25000
+    adjust "slow_time" 500
+    adjust "prochot_deassertion_ramp" 1
+    adjust "tctl_temp" 90
     adjust "apu_skin_temp_limit" 50
     adjust "stapm_time" 500
     # adjust "vrmmax_current" 80000
@@ -176,7 +171,9 @@ if($ry -eq 0){
 
 function adjust ([String] $fieldName, [uInt32] $value) {
     if($fieldName -eq $Script:monitorField) {
-        $newTargetValue = [math]::round($value * 0.001, 3, 0)
+        # Adjust target value to the unit of measurement of return value of RyzenAdj
+        $multiplier = if($value -gt 2000) { 0.001 } else { 1 }
+        $newTargetValue = [math]::round($value * $multiplier, 3, 0)
         if($Script:monitorFieldAdjTarget -ne $newTargetValue){
             $Script:monitorFieldAdjTarget = $newTargetValue
             Write-Host "set new monitoring target $fieldName to $newTargetValue"
@@ -228,7 +225,7 @@ function updateMonitorFieldAdjResult {
 
 function testConfiguration {
     Write-Host "Test Adjustments"
-    doAdjust_ACmode
+    doAdjust_ryzenadj
     testMonitorField
     $Script:monitorFieldAdjTarget = 0
     updateMonitorFieldAdjResult
@@ -277,7 +274,7 @@ Write-Host "$processType every $Script:repeatWaitTimeSeconds seconds..."
 while($true) {
 
         $oldWait = $Script:repeatWaitTimeSeconds
-        doAdjust_ACmode
+        doAdjust_ryzenadj
         updateMonitorFieldAdjResult
         if($resetSTAPMUsage){
             resetSTAPMIfNeeded

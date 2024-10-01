@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Automates ecprobe calls based on custom conditions
 .NOTES
@@ -61,7 +61,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -lt 65 -and $sensor.Value -gt 50) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Seconds 1
+                                Start-Sleep -Seconds 10
                             }
                         }
                     }
@@ -75,7 +75,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -lt 70 -and $sensor.Value -gt 60) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Seconds 1
+                                Start-Sleep -Seconds 5
                             }
                         }
                     }
@@ -103,7 +103,7 @@ foreach ($hardwareItem in $hwmon.Hardware){
                             while ($sensor.Value -gt 60) {
                                 $hardwareItem.Update()
                                 # $sensor.Value
-                                Start-Sleep -Seconds 5
+                                Start-Sleep -Seconds 20
                             }
                         }
                     }
