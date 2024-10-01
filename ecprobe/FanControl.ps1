@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Automates ecprobe calls based on custom conditions
+    Automates ecprobe calls based on custom conditions.
 .NOTES
     SPDX-License-Identifier: LGPL
     Angelo Kim Hui Lim <angelokimhui@gmail.com>
@@ -9,22 +9,22 @@
 # Fix CPU Util bug after bootup
 Start-Sleep -Seconds 1
 
+# Load the hardware monitor library
 Add-Type -Path "$PSScriptRoot\Plugins\OpenHardwareMonitorLib.dll"
 $hwmon = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
 $hwmon.CPUEnabled = $true
 $hwmon.Open()
 
-# Initialize fanspeed state
 [Int]$currentFS = -1
 
-# Helper function to set fan speed
+# Function to update fan speed if necessary
 function Set-FanSpeed {
     param (
-        [int]$speed
+        [int]$newSpeed
     )
-    if ($currentFS -ne $speed) {
-        $currentFS = $speed
-        Start-Process -WindowStyle Hidden -Wait -FilePath "$PSScriptRoot\ec-probe.exe" -ArgumentList "write", "44", "$speed"
+    if ($currentFS -ne $newSpeed) {
+        $currentFS = $newSpeed
+        Start-Process -WindowStyle Hidden -Wait -FilePath "$PSScriptRoot\ec-probe.exe" -ArgumentList("write", "44", "$newSpeed")
     }
 }
 
@@ -37,15 +37,51 @@ foreach ($hardwareItem in $hwmon.Hardware) {
             if ($sensor.SensorType -eq "Temperature") {
                 while ($true) {
                     $hardwareItem.Update()
-                    $temp = $sensor.Value
+                    $temperature = $sensor.Value
 
-                    switch ($temp) {
-                        { $_ -le 35 } { Set-FanSpeed 0; Start-Sleep -Seconds 3 }
-                        { $_ -le 50 } { Set-FanSpeed 30; Start-Sleep -Seconds 2 }
-                        { $_ -le 60 } { Set-FanSpeed 50; Start-Sleep -Seconds 5 }
-                        { $_ -le 65 } { Set-FanSpeed 60; Start-Sleep -Seconds 5 }
-                        { $_ -le 70 } { Set-FanSpeed 95; Start-Sleep -Seconds 5 }
-                        default { Set-FanSpeed 100; Start-Sleep -Seconds 5 }
+                    switch ($temperature) {
+                        {$_ -le 35} {
+                            Set-FanSpeed 0
+                            while ($sensor.Value -lt 40) {
+                                $hardwareItem.Update()
+                                Start-Sleep -Seconds 3
+                            }
+                        }
+                        {$_ -le 50} {
+                            Set-FanSpeed 30
+                            while ($sensor.Value -lt 60 -and $sensor.Value -gt 30) {
+                                $hardwareItem.Update()
+                                Start-Sleep -Seconds 2
+                            }
+                        }
+                        {$_ -le 60} {
+                            Set-FanSpeed 50
+                            while ($sensor.Value -lt 65 -and $sensor.Value -gt 50) {
+                                $hardwareItem.Update()
+                                Start-Sleep -Seconds 10
+                            }
+                        }
+                        {$_ -le 65} {
+                            Set-FanSpeed 60
+                            while ($sensor.Value -lt 70 -and $sensor.Value -gt 60) {
+                                $hardwareItem.Update()
+                                Start-Sleep -Seconds 5
+                            }
+                        }
+                        {$_ -le 70} {
+                            Set-FanSpeed 95
+                            while ($sensor.Value -lt 75 -and $sensor.Value -gt 65) {
+                                $hardwareItem.Update()
+                                Start-Sleep -Seconds 10
+                            }
+                        }
+                        default {
+                            Set-FanSpeed 100
+                            while ($sensor.Value -gt 60) {
+                                $hardwareItem.Update()
+                                Start-Sleep -Seconds 20
+                            }
+                        }
                     }
                 }
             }
