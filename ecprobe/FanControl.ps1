@@ -28,6 +28,29 @@ function Set-FanSpeed {
     }
 }
 
+# Function to manage temperature monitoring and sleep duration
+function Monitor-Temperature {
+    param (
+        [int]$targetMin,
+        [int]$targetMax,
+        [int]$fanSpeed,
+        [int]$sleepDuration
+    )
+
+    Set-FanSpeed $fanSpeed
+
+    while ($true) {
+        $hardwareItem.Update()
+        $sensorValue = $sensor.Value
+
+        if ($sensorValue -lt $targetMax -and $sensorValue -gt $targetMin) {
+            Start-Sleep -Seconds $sleepDuration
+        } else {
+            break
+        }
+    }
+}
+
 # Monitor CPU temperature and adjust fan speed accordingly
 foreach ($hardwareItem in $hwmon.Hardware) {
     if ($hardwareItem.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU) {
@@ -41,46 +64,22 @@ foreach ($hardwareItem in $hwmon.Hardware) {
 
                     switch ($temperature) {
                         {$_ -le 35} {
-                            Set-FanSpeed 0
-                            while ($sensor.Value -lt 40) {
-                                $hardwareItem.Update()
-                                Start-Sleep -Seconds 3
-                            }
+                            Monitor-Temperature -targetMin 35 -targetMax 40 -fanSpeed 0 -sleepDuration 3
                         }
                         {$_ -le 50} {
-                            Set-FanSpeed 30
-                            while ($sensor.Value -lt 60 -and $sensor.Value -gt 30) {
-                                $hardwareItem.Update()
-                                Start-Sleep -Seconds 2
-                            }
+                            Monitor-Temperature -targetMin 30 -targetMax 60 -fanSpeed 30 -sleepDuration 2
                         }
                         {$_ -le 60} {
-                            Set-FanSpeed 50
-                            while ($sensor.Value -lt 65 -and $sensor.Value -gt 50) {
-                                $hardwareItem.Update()
-                                Start-Sleep -Seconds 10
-                            }
+                            Monitor-Temperature -targetMin 50 -targetMax 65 -fanSpeed 50 -sleepDuration 5
                         }
                         {$_ -le 65} {
-                            Set-FanSpeed 60
-                            while ($sensor.Value -lt 70 -and $sensor.Value -gt 60) {
-                                $hardwareItem.Update()
-                                Start-Sleep -Seconds 5
-                            }
+                            Monitor-Temperature -targetMin 60 -targetMax 70 -fanSpeed 60 -sleepDuration 5
                         }
                         {$_ -le 70} {
-                            Set-FanSpeed 95
-                            while ($sensor.Value -lt 75 -and $sensor.Value -gt 65) {
-                                $hardwareItem.Update()
-                                Start-Sleep -Seconds 10
-                            }
+                            Monitor-Temperature -targetMin 65 -targetMax 75 -fanSpeed 95 -sleepDuration 10
                         }
                         default {
-                            Set-FanSpeed 100
-                            while ($sensor.Value -gt 60) {
-                                $hardwareItem.Update()
-                                Start-Sleep -Seconds 20
-                            }
+                            Monitor-Temperature -targetMin 60 -targetMax [int]::MaxValue -fanSpeed 100 -sleepDuration 20
                         }
                     }
                 }
