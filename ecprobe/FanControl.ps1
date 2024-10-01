@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Automates ecprobe calls based on custom conditions
 .NOTES
@@ -9,107 +9,48 @@
 # Fix CPU Util bug after bootup
 Start-Sleep -Seconds 1
 
-Add-Type -Path $PSScriptRoot"\Plugins\OpenHardwareMonitorLib.dll"
+Add-Type -Path "$PSScriptRoot\Plugins\OpenHardwareMonitorLib.dll"
 $hwmon = New-Object -TypeName OpenHardwareMonitor.Hardware.Computer
-$hwmon.CPUEnabled= 1;
-$hwmon.Open();
+$hwmon.CPUEnabled = $true
+$hwmon.Open()
 
-[Int]$currentFS = -1;
-Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "100")
+# Initialize fanspeed state
+[Int]$currentFS = -1
 
-foreach ($hardwareItem in $hwmon.Hardware){
-    if($hardwareItem.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU){
+# Helper function to set fan speed
+function Set-FanSpeed {
+    param (
+        [int]$speed
+    )
+    if ($currentFS -ne $speed) {
+        $currentFS = $speed
+        Start-Process -WindowStyle Hidden -Wait -FilePath "$PSScriptRoot\ec-probe.exe" -ArgumentList "write", "44", "$speed"
+    }
+}
+
+# Monitor CPU temperature and adjust fan speed accordingly
+foreach ($hardwareItem in $hwmon.Hardware) {
+    if ($hardwareItem.HardwareType -eq [OpenHardwareMonitor.Hardware.HardwareType]::CPU) {
         $hardwareItem.Update()
-        foreach ($sensor in $hardwareItem.Sensors){
-            if ($sensor.SensorType -eq "Temperature"){
-                while ($true){
-                    if ($sensor.Value -le 35){
-                        if ($currentFS -ne 0) {
-                            $currentFS = 0;
-                            # Write-Host "Writing to EC - Fanspeed 0"
-                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "0")
-                        }
-                        else {
-                            while ($sensor.Value -lt 40) {
-                                $hardwareItem.Update()
-                                # $sensor.Value
-                                Start-Sleep -Seconds 3
-                            }
-                        }
-                    }
-                    elseif ($sensor.Value -le 50){
-                        if ($currentFS -ne 30) {
-                            $currentFS = 30;
-                            # Write-Host "Writing to EC - Fanspeed 30"
-                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "30")
-                        }
-                        else {
-                            while ($sensor.Value -lt 60 -and $sensor.Value -gt 30) {
-                                $hardwareItem.Update()
-                                # $sensor.Value
-                                Start-Sleep -Seconds 2
-                            }
-                        }
-                    }
-                    elseif ($sensor.Value -le 60){
-                        if ($currentFS -ne 50) {
-                            $currentFS = 50;
-                            # Write-Host "Writing to EC - Fanspeed 50"
-                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "50")
-                        }
-                        else {
-                            while ($sensor.Value -lt 65 -and $sensor.Value -gt 50) {
-                                $hardwareItem.Update()
-                                # $sensor.Value
-                                Start-Sleep -Seconds 10
-                            }
-                        }
-                    }
-                    elseif ($sensor.Value -le 65){
-                        if ($currentFS -ne 60) {
-                            $currentFS = 60;
-                            # Write-Host "Writing to EC - Fanspeed 60"
-                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "60")
-                        }
-                        else {
-                            while ($sensor.Value -lt 70 -and $sensor.Value -gt 60) {
-                                $hardwareItem.Update()
-                                # $sensor.Value
-                                Start-Sleep -Seconds 5
-                            }
-                        }
-                    }
-                    elseif ($sensor.Value -le 70){
-                        if ($currentFS -ne 95) {
-                            $currentFS = 95;
-                            # Write-Host "Writing to EC - Fanspeed 80"
-                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "95")
-                        }
-                        else {
-                            while ($sensor.Value -lt 75 -and $sensor.Value -gt 65) {
-                                $hardwareItem.Update()
-                                # $sensor.Value
-                                Start-Sleep -Seconds 10
-                            }
-                        }
-                    }
-                    elseif ($sensor.Value -ge 70){
-                        if ($currentFS -ne 100) {
-                            $currentFS = 100;
-                            # Write-Host "Writing to EC - Fanspeed 100"
-                            Start-Process -WindowStyle Hidden -Wait -filePath $PSScriptRoot\"ec-probe.exe" -ArgumentList("write", "44", "100")
-                        }
-                        else {
-                            while ($sensor.Value -gt 60) {
-                                $hardwareItem.Update()
-                                # $sensor.Value
-                                Start-Sleep -Seconds 20
-                            }
-                        }
+
+        foreach ($sensor in $hardwareItem.Sensors) {
+            if ($sensor.SensorType -eq "Temperature") {
+                while ($true) {
+                    $hardwareItem.Update()
+                    $temp = $sensor.Value
+
+                    switch ($temp) {
+                        { $_ -le 35 } { Set-FanSpeed 0; Start-Sleep -Seconds 3 }
+                        { $_ -le 50 } { Set-FanSpeed 30; Start-Sleep -Seconds 2 }
+                        { $_ -le 60 } { Set-FanSpeed 50; Start-Sleep -Seconds 5 }
+                        { $_ -le 65 } { Set-FanSpeed 60; Start-Sleep -Seconds 5 }
+                        { $_ -le 70 } { Set-FanSpeed 95; Start-Sleep -Seconds 5 }
+                        default { Set-FanSpeed 100; Start-Sleep -Seconds 5 }
                     }
                 }
             }
         }
     }
 }
-$hwmon.Close();
+
+$hwmon.Close()
